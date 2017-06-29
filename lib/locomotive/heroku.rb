@@ -11,16 +11,15 @@ module Locomotive
       attr_accessor :connection, :app_name, :domains
 
       def domains
-        if @domains.nil?
-          response = self.connection.get_domains(self.app_name)
-
-          if response.status == 200
-            @domains = response.body.map { |h| h['domain'] }.reject { |n| n.starts_with?('*') }
-          else
-            @domains = []
-          end
-        else
-          @domains
+        @domains ||= ENV['DOMAINS'].split(',').map do |fqdn|
+          {
+            id:           rand(100000),
+            domain:       fqdn,
+            base_domain:  fqdn,
+            default:      nil,
+            created_at:   Time.now,
+            updated_at:   Time.now,
+          }.stringify_keys
         end
       end
 
